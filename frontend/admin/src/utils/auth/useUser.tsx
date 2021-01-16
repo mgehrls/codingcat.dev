@@ -12,13 +12,15 @@ import { Observable } from 'rxjs';
 import { authState } from 'rxfire/auth';
 import { filter, map, switchMap, takeWhile } from 'rxjs/operators';
 import firebase from 'firebase/app';
+import { UserInfoExtended } from '@/models/user.model';
+
 const useUser = () => {
   const [app, setApp] = useState<firebase.app.App>();
-  const [user, setUser] = useState<firebase.UserInfo | null>();
+  const [user, setUser] = useState<UserInfoExtended | null>();
   const [
     userProfile,
     setUserProfile,
-  ] = useState<Observable<firebase.UserInfo> | null>(null);
+  ] = useState<Observable<UserInfoExtended> | null>(null);
   const router = useRouter();
 
   const signout = async () => {

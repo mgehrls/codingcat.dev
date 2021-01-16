@@ -154,7 +154,7 @@ export default function VideoFormModal({
             paddingRight: '0.5rem',
           }}
         >
-          Add Video Cover
+          Add Video From URL
         </Box>
         <VideoIcon />
       </Button>

@@ -392,3 +392,26 @@ export function cleanTimestamp(data: FirebaseFirestore.DocumentData) {
   });
   return docData;
 }
+
+/* YouTube Upload */
+export const getAuthURL = (params: any) => {
+  return functions$.pipe(
+    switchMap((functions) =>
+      httpsCallable(
+        functions,
+        'ext-ccd-extension-youtube-upload-getAuthURL'
+      ).call('params', params)
+    )
+  );
+};
+
+export const createAndSaveTokens = (params: any) => {
+  return functions$.pipe(
+    switchMap((functions) =>
+      httpsCallable(
+        functions,
+        'ext-ccd-extension-youtube-upload-createAndSaveTokens'
+      ).call('params', params)
+    )
+  );
+};

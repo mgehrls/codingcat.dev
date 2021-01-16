@@ -17,7 +17,6 @@ import {
   postDataObservable,
   postHistoriesDataObservable,
   postHistoryCreate,
-  postHistoryPublish,
   postHistoryUpdate,
 } from '@/services/api';
 
@@ -39,6 +38,8 @@ import VideoFormModal from '@/components/Admin/VideoFormModal';
 import ImageModal from '@/components/Admin/ImageModal';
 import VideoModal from '@/components/Admin/VideoModal';
 import PublishModal from '@/components/Admin/PublishModal';
+import { NextRouter } from 'next/router';
+import YouTubeUpload from '@/components/YouTube/YouTubeUpload';
 
 enum TabType {
   edit = 'edit',
@@ -78,9 +79,9 @@ export default function EditPost({
   router,
   type,
 }: {
-  router: any;
+  router: NextRouter;
   type: PostType;
-}) {
+}): JSX.Element {
   const [postFound, setPostFound] = useState(false);
   const [postHistories, setPostHistories] = useState<Post[] | Course[]>([]);
   const [history, setHistory] = useState<Post | Course>();
@@ -320,6 +321,7 @@ export default function EditPost({
                           setHistory={setHistory}
                           post={history}
                         />
+                        <YouTubeUpload />
                       </Box>
                     )}
                   </Box>
