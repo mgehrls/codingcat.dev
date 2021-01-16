@@ -1,3 +1,4 @@
+import { UserInfoExtended } from './../../../main/src/models/user.model';
 import {
   PostType,
   PostStatus,
@@ -413,5 +414,25 @@ export const createAndSaveTokens = (params: any) => {
         'ext-ccd-extension-youtube-upload-createAndSaveTokens'
       ).call('params', params)
     )
+  );
+};
+
+export const userYouTubeApiToken = (user: UserInfoExtended) => {
+  return firestore$.pipe(
+    switchMap((firestore) =>
+      docData<{ refresh_token: string }>(
+        firestore.doc(`youtubeApiTokens/${user.uid}`)
+      ).pipe(filter((t) => t.refresh_token !== null))
+    )
+  );
+};
+
+export const deleteUserYouTubeApiToken = (user: UserInfoExtended) => {
+  return firestore$.pipe(
+    switchMap((firestore) => {
+      const ref = `youtubeApiTokens/${user.uid}`;
+      firestore.doc(ref).delete();
+      return docData<{ refresh_token: string }>(firestore.doc(ref));
+    })
   );
 };

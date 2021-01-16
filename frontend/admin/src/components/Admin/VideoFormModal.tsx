@@ -12,7 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import VideoIcon from '@material-ui/icons/FeaturedVideo';
 import { makeStyles, createStyles } from '@material-ui/core';
-import { red } from '@material-ui/core/colors';
+import { grey } from '@material-ui/core/colors';
 
 import { Theme as AugmentedTheme } from '@material-ui/core';
 import { MediaType, Post } from '@/models/post.model';
@@ -25,9 +25,9 @@ import { Course } from '@/models/course.model.ts';
 const useStyles = makeStyles(() =>
   createStyles({
     video: {
-      backgroundColor: red[500],
+      backgroundColor: grey[500],
       '&:hover': {
-        backgroundColor: red[300],
+        backgroundColor: grey[300],
       },
     },
     root: {

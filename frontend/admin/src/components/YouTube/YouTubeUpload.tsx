@@ -1,3 +1,5 @@
+import { useRouter } from 'next/router';
+
 import { makeStyles, createStyles, Button, Box } from '@material-ui/core';
 import { red } from '@material-ui/core/colors';
 
@@ -20,22 +22,14 @@ const useStyles = makeStyles(() =>
 
 export default function YouTubeUpload(): JSX.Element {
   const { user }: { user: UserInfoExtended | null | undefined } = useUser();
-
+  const router = useRouter();
   const classes = useStyles();
   return (
     <>
       <Button
         variant="contained"
         className={classes.video}
-        onClick={() =>
-          getAuthURL({
-            redirectUri: 'http://localhost:3001/auth/youtube',
-          })
-            .pipe(take(1))
-            .subscribe((r) => {
-              window.location.href = r as string;
-            })
-        }
+        onClick={() => router.push('/auth/youtube')}
       >
         <Box
           sx={{
