@@ -262,7 +262,7 @@ export default function EditPost({
                   display: 'flex',
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  bgcolor: 'background.paper',
+                  padding: '0.5rem',
                   justifyContent: 'space-between',
                 }}
                 style={{ width: '100%' }}
