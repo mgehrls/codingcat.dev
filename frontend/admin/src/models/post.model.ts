@@ -40,6 +40,7 @@ export interface CoverMedia {
 export enum MediaSource {
   video = 'video',
   cloudinary = 'cloudinary',
+  youtube = 'youtube',
 }
 
 export enum PostStatus {

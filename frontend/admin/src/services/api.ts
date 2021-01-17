@@ -8,12 +8,13 @@ import {
 } from './../models/post.model';
 import firebase from 'firebase/app';
 import initFirebase from '@/utils/initFirebase';
-import { docData, collectionData, doc } from 'rxfire/firestore';
+import { docData, collectionData } from 'rxfire/firestore';
 import { httpsCallable } from 'rxfire/functions';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import { getDownloadURL, getMetadata, percentage, put } from 'rxfire/storage';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { Post, MediaType } from '@/models/post.model';
 import { v4 as uuid } from 'uuid';
-import { from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { Course, Section } from '@/models/course.model.ts';
 import { Cloudinary } from '@/models/cloudinary.model';
 import { Video } from '@/models/video.model';
@@ -28,6 +29,12 @@ const functions$ = from(initFirebase()).pipe(
   filter((app) => app !== undefined),
   map((app) => app as firebase.app.App),
   map((app) => app.functions() as firebase.functions.Functions)
+);
+
+const storage$ = from(initFirebase()).pipe(
+  filter((app) => app !== undefined),
+  map((app) => app as firebase.app.App),
+  map((app) => app.storage() as firebase.storage.Storage)
 );
 
 /* POST */
@@ -433,6 +440,21 @@ export const deleteUserYouTubeApiToken = (user: UserInfoExtended) => {
       const ref = `youtubeApiTokens/${user.uid}`;
       firestore.doc(ref).delete();
       return docData<{ refresh_token: string }>(firestore.doc(ref));
+    })
+  );
+};
+
+export const uploadVideo = (
+  storagePath: string,
+  blob: any
+): Observable<{
+  progress: number;
+  snapshot: firebase.storage.UploadTaskSnapshot;
+}> => {
+  return storage$.pipe(
+    switchMap((storage) => {
+      const dataRef = storage.ref(storagePath);
+      return percentage(dataRef.put(blob));
     })
   );
 };

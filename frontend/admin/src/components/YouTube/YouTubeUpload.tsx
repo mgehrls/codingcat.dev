@@ -10,7 +10,7 @@ import {
 import { red, grey } from '@material-ui/core/colors';
 
 import YouTubeIcon from '@material-ui/icons/YouTube';
-import { userYouTubeApiToken } from '@/services/api';
+import { uploadVideo, userYouTubeApiToken } from '@/services/api';
 import { UserInfoExtended } from '@/models/user.model';
 import { useUser } from '@/utils/auth/useUser';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -22,6 +22,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
+import Snackbar from '@material-ui/core/Snackbar';
+
+import firebase from 'firebase/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -71,7 +74,6 @@ export default function YouTubeUpload(): JSX.Element {
     refresh_token: string;
   }> | null>(null);
   const [open, setOpen] = useState(false);
-
   useEffect(() => {
     if (user && user.uid) {
       setUserToken$(userYouTubeApiToken(user));
@@ -100,6 +102,38 @@ export default function YouTubeUpload(): JSX.Element {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [uploadPercentage, setUploadPercentage] = useState(0);
+  const handleSnackOpen = () => {
+    setSnackOpen(true);
+  };
+  const handleSnackClose = () => {
+    setSnackOpen(true);
+  };
+
+  const [upload$, setUpload$] = useState<Observable<{
+    progress: number;
+    snapshot: firebase.storage.UploadTaskSnapshot;
+  }> | null>(null);
+  useEffect(() => {
+    if (!upload$) {
+      return;
+    }
+    const sub = upload$?.subscribe((u) => {
+      handleClose();
+      handleSnackOpen();
+      setUploadPercentage(u.progress);
+      console.log('Snapshot', u.snapshot);
+    });
+    return () => {
+      if (sub) sub.unsubscribe();
+    };
+  }, [upload$]);
+
+  const onUploadVideo = () => {
+    acceptedFiles.map((file: any) => setUpload$(uploadVideo('/alex', file)));
   };
 
   const {
@@ -202,11 +236,17 @@ export default function YouTubeUpload(): JSX.Element {
               <Button color="secondary" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button variant="contained" onClick={handleClose}>
-                Subscribe
+              <Button variant="contained" onClick={onUploadVideo}>
+                Upload
               </Button>
             </DialogActions>
           </Dialog>
+          <Snackbar
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            open={snackOpen}
+            onClose={handleSnackClose}
+            message={`Uploading ${uploadPercentage}`}
+          />
         </>
       )}
     </>

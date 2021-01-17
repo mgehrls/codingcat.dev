@@ -13,6 +13,7 @@ export default async function initFirebase() {
     await import('firebase/remote-config');
     await import('firebase/messaging');
     await import('firebase/functions');
+    await import('firebase/storage');
     if (!firebase.default.apps.length) {
       firebase.default.initializeApp(config);
       if (process.env.NEXT_PUBLIC_CCD_EMULATED) {
@@ -29,6 +30,7 @@ export default async function initFirebase() {
       firebase.default.analytics();
       firebase.default.remoteConfig();
       firebase.default.messaging();
+      firebase.default.storage();
     }
     return firebase.default.app();
   } catch (err) {
