@@ -312,6 +312,8 @@ export default function EditPost({
                           gap: '0.5rem',
                         }}
                       >
+                        <YouTubeUpload />
+
                         <CloudinaryUpload
                           setHistory={setHistory}
                           history={history}
@@ -321,7 +323,6 @@ export default function EditPost({
                           setHistory={setHistory}
                           post={history}
                         />
-                        <YouTubeUpload />
                       </Box>
                     )}
                   </Box>
