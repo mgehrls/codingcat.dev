@@ -6,11 +6,17 @@ import {
   Button,
   Box,
   Theme,
+  IconButton,
 } from '@material-ui/core';
 import { red, grey } from '@material-ui/core/colors';
 
 import YouTubeIcon from '@material-ui/icons/YouTube';
-import { uploadVideo, userYouTubeApiToken } from '@/services/api';
+import {
+  getVideoMetaData,
+  getVideoUrl,
+  uploadVideo,
+  userYouTubeApiToken,
+} from '@/services/api';
 import { UserInfoExtended } from '@/models/user.model';
 import { useUser } from '@/utils/auth/useUser';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -23,8 +29,12 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import Snackbar from '@material-ui/core/Snackbar';
+import CloseIcon from '@material-ui/icons/Close';
 
 import firebase from 'firebase/app';
+import { Course } from '@/models/course.model.ts';
+import { Post } from '@/models/post.model';
+import { take } from 'rxjs/operators';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -64,10 +74,19 @@ const useStyles = makeStyles((theme: Theme) =>
     rejectStyle: {
       borderColor: '#ff1744',
     },
+    close: {
+      padding: theme.spacing(0.5),
+    },
   })
 );
 
-export default function YouTubeUpload(): JSX.Element {
+export default function YouTubeUpload({
+  setHistory,
+  history,
+}: {
+  setHistory: React.Dispatch<React.SetStateAction<Post | Course | undefined>>;
+  history: Post;
+}): JSX.Element {
   const { user }: { user: UserInfoExtended | null | undefined } = useUser();
   const [token, setToken] = useState<{ refresh_token: string } | null>(null);
   const [userToken$, setUserToken$] = useState<Observable<{
@@ -110,7 +129,7 @@ export default function YouTubeUpload(): JSX.Element {
     setSnackOpen(true);
   };
   const handleSnackClose = () => {
-    setSnackOpen(true);
+    setSnackOpen(false);
   };
 
   const [upload$, setUpload$] = useState<Observable<{
@@ -121,16 +140,34 @@ export default function YouTubeUpload(): JSX.Element {
     if (!upload$) {
       return;
     }
-    const sub = upload$?.subscribe((u) => {
+    const sub = upload$?.subscribe((m) => {
       handleClose();
       handleSnackOpen();
-      setUploadPercentage(u.progress);
-      console.log('Snapshot', u.snapshot);
+      setUploadPercentage(m.progress);
+      if (m.progress === 100) {
+        getVideoUrl(m.snapshot.ref.fullPath)
+          .pipe(take(1))
+          .subscribe((u) => console.log(u));
+        getVideoMetaData(m.snapshot.ref.fullPath)
+          .pipe(take(1))
+          .subscribe((d) => console.log(d));
+        if (sub) {
+          sub.unsubscribe();
+          setUpload$(null);
+        }
+      }
     });
     return () => {
       if (sub) sub.unsubscribe();
     };
   }, [upload$]);
+
+  const handleVidoUploadCancel = () => {
+    upload$?.pipe(take(1)).subscribe((m) => {
+      console.log(m.snapshot.task);
+      console.log(m.snapshot.task.cancel());
+    });
+  };
 
   const onUploadVideo = () => {
     acceptedFiles.map((file: any) => setUpload$(uploadVideo('/alex', file)));
@@ -246,7 +283,26 @@ export default function YouTubeUpload(): JSX.Element {
             open={snackOpen}
             onClose={handleSnackClose}
             message={`Uploading ${uploadPercentage}`}
-          />
+            action={
+              <React.Fragment>
+                <Button
+                  color="secondary"
+                  size="small"
+                  onClick={handleVidoUploadCancel}
+                >
+                  CANCEL
+                </Button>
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  className={classes.close}
+                  onClick={handleSnackClose}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </React.Fragment>
+            }
+          ></Snackbar>
         </>
       )}
     </>

@@ -458,3 +458,20 @@ export const uploadVideo = (
     })
   );
 };
+
+export const getVideoUrl = (storagePath: string): Observable<string> => {
+  return storage$.pipe(
+    switchMap((storage) => {
+      const dataRef = storage.ref(storagePath);
+      return getDownloadURL(dataRef);
+    })
+  );
+};
+export const getVideoMetaData = (storagePath: string): Observable<any> => {
+  return storage$.pipe(
+    switchMap((storage) => {
+      const dataRef = storage.ref(storagePath);
+      return getMetadata(dataRef);
+    })
+  );
+};
