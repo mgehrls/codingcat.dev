@@ -18,6 +18,7 @@ import { from, Observable } from 'rxjs';
 import { Course, Section } from '@/models/course.model.ts';
 import { Cloudinary } from '@/models/cloudinary.model';
 import { Video } from '@/models/video.model';
+import { YouTubeVideo } from '@/models/youtube.video.model';
 
 const firestore$ = from(initFirebase()).pipe(
   filter((app) => app !== undefined),
@@ -473,5 +474,20 @@ export const getVideoMetaData = (storagePath: string): Observable<any> => {
       const dataRef = storage.ref(storagePath);
       return getMetadata(dataRef);
     })
+  );
+};
+
+export const publishYouTube = (params: {
+  publishDoc: string;
+  storageMetadata: firebase.storage.FullMetadata;
+  video: YouTubeVideo;
+}): Observable<any> => {
+  return functions$.pipe(
+    switchMap((functions) =>
+      httpsCallable(
+        functions,
+        'ext-ccd-extension-youtube-upload-onPublish'
+      ).call('params', params)
+    )
   );
 };

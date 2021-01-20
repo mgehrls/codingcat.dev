@@ -14,6 +14,7 @@ import YouTubeIcon from '@material-ui/icons/YouTube';
 import {
   getVideoMetaData,
   getVideoUrl,
+  publishYouTube,
   uploadVideo,
   userYouTubeApiToken,
 } from '@/services/api';
@@ -35,6 +36,7 @@ import firebase from 'firebase/app';
 import { Course } from '@/models/course.model.ts';
 import { Post } from '@/models/post.model';
 import { take } from 'rxjs/operators';
+import { v4 as uuid } from 'uuid';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -140,27 +142,52 @@ export default function YouTubeUpload({
     if (!upload$) {
       return;
     }
-    const sub = upload$?.subscribe((m) => {
-      handleClose();
-      handleSnackOpen();
-      setUploadPercentage(m.progress);
-      if (m.progress === 100) {
-        getVideoUrl(m.snapshot.ref.fullPath)
+    const sub = upload$?.subscribe(
+      (m) => {
+        handleClose();
+        handleSnackOpen();
+        setUploadPercentage(m.progress);
+      },
+      (err) => {
+        console.log(err);
+      },
+      () => {
+        getVideoMetaData(uploadPath)
           .pipe(take(1))
-          .subscribe((u) => console.log(u));
-        getVideoMetaData(m.snapshot.ref.fullPath)
-          .pipe(take(1))
-          .subscribe((d) => console.log(d));
+          .subscribe((d) => {
+            console.log(d);
+            publishYouTube({
+              publishDoc: uploadPath,
+              storageMetadata: d,
+              video: {
+                snippet: {
+                  title: 'Alex First Test',
+                  description: 'Hope This works.',
+                },
+              },
+            })
+              .pipe(take(1))
+              .subscribe((c) => console.log(c));
+          });
         if (sub) {
           sub.unsubscribe();
           setUpload$(null);
         }
       }
-    });
+    );
     return () => {
       if (sub) sub.unsubscribe();
     };
   }, [upload$]);
+
+  const [uploadPath, setUploadPath] = useState('');
+
+  useEffect(() => {
+    const id = uuid();
+    setUploadPath(
+      `posts/${history.postId}/history/${history.id}/uploads/${id}`
+    );
+  }, [history]);
 
   const handleVidoUploadCancel = () => {
     upload$?.pipe(take(1)).subscribe((m) => {
@@ -170,7 +197,7 @@ export default function YouTubeUpload({
   };
 
   const onUploadVideo = () => {
-    acceptedFiles.map((file: any) => setUpload$(uploadVideo('/alex', file)));
+    acceptedFiles.map((file: any) => setUpload$(uploadVideo(uploadPath, file)));
   };
 
   const {
