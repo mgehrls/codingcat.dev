@@ -60,11 +60,11 @@ export default function Blog({
         canonical={`https://codingcat.dev/user/profile`}
       ></NextSeo>
       <Layout header={header} footer={footer}>
-        {products ? (
+        {/* {products ? (
           <Profile products={products} />
         ) : (
           <>Ask Alex to load the Stripe products please :D</>
-        )}
+        )} */}
       </Layout>
     </>
   );
