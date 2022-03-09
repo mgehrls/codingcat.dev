@@ -16,7 +16,7 @@ export default function AppMenu({
   userMenu: boolean;
   setUserMenu: Dispatch<SetStateAction<boolean>>;
 }): JSX.Element {
-  const { data: signInCheckResult } = useSigninCheck();
+  // const { data: signInCheckResult } = useSigninCheck();
   const focusme = useRef<null | HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export default function AppMenu({
               </ActiveLink>
             </nav>
             <section className="flex self-end p-4 bg-primary-700 dark:bg-primary-700">
-              <OutsideClick toggle={setUserMenu} value={false}>
+              {/* <OutsideClick toggle={setUserMenu} value={false}>
                 <div className="flex items-center cursor-pointer links-secondary">
                   <AvatarMenu
                     userMenu={userMenu}
@@ -128,7 +128,7 @@ export default function AppMenu({
                     </button>
                   )}
                 </div>
-              </OutsideClick>
+              </OutsideClick> */}
             </section>
           </section>
         </section>
