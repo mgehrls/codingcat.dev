@@ -164,28 +164,28 @@ export async function getStaticProps({
 
 export async function getStaticPaths() {
   const paths: string[] = [];
-  for (const postType of [
-    ModelType.page,
-    ModelType.post,
-    ModelType.tutorial,
-    ModelType.podcast,
-    ModelType.course,
-    ModelType.authors,
-  ]) {
-    const pages = (await getAllBuilder({
-      model: postType,
-      fields: `data.url`,
-      startEnd: true,
-    })) as CodingCatBuilderContent[];
-    pages
-      .filter(
-        (page) =>
-          !['/blog', '/courses', '/podcasts', '/tutorials'].includes(
-            `${page?.data?.url}`
-          )
-      )
-      .map((page) => paths.push(`${page?.data?.url}`));
-  }
+  // for (const postType of [
+  //   ModelType.page,
+  //   ModelType.post,
+  //   ModelType.tutorial,
+  //   ModelType.podcast,
+  //   ModelType.course,
+  //   ModelType.authors,
+  // ]) {
+  //   const pages = (await getAllBuilder({
+  //     model: postType,
+  //     fields: `data.url`,
+  //     startEnd: true,
+  //   })) as CodingCatBuilderContent[];
+  //   pages
+  //     .filter(
+  //       (page) =>
+  //         !['/blog', '/courses', '/podcasts', '/tutorials'].includes(
+  //           `${page?.data?.url}`
+  //         )
+  //     )
+  //     .map((page) => paths.push(`${page?.data?.url}`));
+  // }
   return {
     paths,
     fallback: true,

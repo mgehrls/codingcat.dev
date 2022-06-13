@@ -3,13 +3,12 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from 'next';
 
 import { getAllBuilder } from '@/services/builder.server';
 import { NextSeo } from 'next-seo';
-import { getActiveMemberProducts } from '@/services/firebase.server';
 import Profile from '@/components/user/Profile';
 
 export async function getStaticProps({
   preview,
 }: GetStaticPropsContext<{ page: string[] }>) {
-  const [header, footer, modelData, products] = await Promise.all([
+  const [header, footer, modelData] = await Promise.all([
     getAllBuilder({
       preview,
       model: 'header',
@@ -29,7 +28,6 @@ export async function getStaticProps({
       },
       startEnd: true,
     }),
-    getActiveMemberProducts(),
   ]);
 
   return {
@@ -38,7 +36,7 @@ export async function getStaticProps({
       model: 'page',
       header: header?.[0] ? header[0] : null,
       footer: footer?.[0] ? footer[0] : null,
-      products: products ? products : null,
+      products: null,
     },
     revalidate: 3600,
   };

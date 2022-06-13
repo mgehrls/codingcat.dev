@@ -95,17 +95,8 @@ export async function getStaticProps({
 }
 
 export async function getStaticPaths() {
-  const frameworks = (await getAllBuilder({
-    model: 'framework',
-    fields: `data.slug`,
-    startEnd: true,
-  })) as CodingCatBuilderFramework[];
-  const paths = frameworks.map((page) => {
-    return { params: { framework: `${page?.data?.slug.replace('/', '')}` } };
-  });
-  console.log('paths', JSON.stringify(paths));
   return {
-    paths,
+    paths: [],
     fallback: true,
   };
 }
