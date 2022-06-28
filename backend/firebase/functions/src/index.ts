@@ -24,3 +24,6 @@ export { scheduledNotionToAlgolia } from './algolia/algolia';
 // Calendly webhook pushes to pubsub
 export { calendlyWebook } from './calendly/webhook';
 export { calendlyCreateNotionCardPubSub } from './calendly/pubsub';
+
+// GitHub
+export { gitHubSponsorshipWebhook } from './github/webhooks';
