@@ -142,6 +142,9 @@
       #4b0a75 100%
     );
   }
+  .rnr-inline-code {
+    @apply transition-colors text-basics-50 bg-primary-500 rounded-xl p-1;
+  }
 }
 
 /* Needed for displaying correct aspect ratio */
