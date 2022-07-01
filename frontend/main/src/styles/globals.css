@@ -143,7 +143,7 @@
     );
   }
   .rnr-inline-code {
-    @apply transition-colors text-basics-50 bg-primary-500 rounded-xl p-1;
+    @apply transition-colors text-basics-50 bg-secondary-600 rounded-xl p-1;
   }
 }
 
