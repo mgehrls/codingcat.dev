@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Content } from '$lib/types';
+	import type { Lesson } from '$lib/types';
 
-	export let lesson: Content[];
+	export let lesson: Lesson[];
 	export let courseSlug: string;
 </script>
 

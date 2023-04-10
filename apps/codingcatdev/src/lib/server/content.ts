@@ -1,7 +1,7 @@
-import { ContentType, ContentPublished } from '$lib/types';
+import fs from 'node:fs';
+import path from 'node:path';
+import { ContentType, ContentPublished, type DirectoryStub, type FileStub } from '$lib/types';
 import type { Content, Course, Podcast } from '$lib/types';
-
-const LIMIT = 20;
 
 // In Dev Mode read directly from content directory
 const markdownFiles: {
@@ -22,11 +22,27 @@ const markdownFiles: {
 	tutorial: []
 };
 
+const LIMIT = 20;
+const EXCLUDED = new Set(['.DS_Store', '.gitkeep', '.svelte-kit', 'package-lock.json']);
+// TODO: Might not need this
+const TEXTFILES = new Set([
+	'.svelte',
+	'.txt',
+	'.json',
+	'.js',
+	'.ts',
+	'.css',
+	'.svg',
+	'.html',
+	'.md',
+	'.env'
+]);
+
 console.log('Building top metadata level');
-const modules = import.meta.glob(['../../content/course/*/*.md', '../../content/*/*.md']);
+const modules = import.meta.glob(['/src/content/course/*/*.md', '/src/content/*/*.md']);
 for (const path in modules) {
 	modules[path]().then((mod) => {
-		const splitPath = path.replace('../../content/', '').split('/');
+		const splitPath = path.replace('/src/content/', '').split('/');
 		const type = splitPath.at(0);
 		const slug = splitPath.at(1);
 
@@ -62,10 +78,10 @@ for (const path in modules) {
 }
 
 console.log('Add Lessons to courses');
-const lessonModules = import.meta.glob('../../content/course/*/lesson/*.md');
+const lessonModules = import.meta.glob('/src/content/course/*/lesson/*/*.md');
 for (const path in lessonModules) {
 	lessonModules[path]().then((mod) => {
-		const splitPath = path.replace('../../content/', '').split('/');
+		const splitPath = path.replace('/src/content/', '').split('/');
 		const type = splitPath.at(0);
 		const slug = splitPath.at(1);
 		const lessonSlug = splitPath?.at(3)?.replace(/\.[^/.]+$/, '');
@@ -105,6 +121,56 @@ for (const path in lessonModules) {
 			.map((c) => {
 				c?.lesson ? c.lesson.push(content) : (c['lesson'] = [content]);
 			});
+	});
+}
+
+// TODO: Maybe this can be cleaner?
+console.log('Add Exercise A');
+const excerciseAModules = import.meta.glob('/src/content/course/*/lesson/*/app-a/**/*.*');
+for (const path in excerciseAModules) {
+	excerciseAModules[path]().then((mod) => {
+		const splitPath = path.replace('/src/content/', '').split('/');
+		const course = splitPath.at(0);
+		const courseSlug = splitPath.at(1);
+		const lesson = splitPath.at(2);
+		const lessonSlug = splitPath.at(3);
+
+		const dir = `${process.cwd()}/src/content/${course}/${courseSlug}/${lesson}/${lessonSlug}/app-a`;
+
+		markdownFiles.course
+			.filter((c) => c.slug === courseSlug)
+			.map((c) =>
+				c?.lesson
+					?.filter((l) => l.slug === lessonSlug)
+					.map((l) => {
+						l.a = walk(dir);
+					})
+			);
+	});
+}
+
+// TODO: Maybe this can be cleaner?
+console.log('Add Exercise A');
+const excerciseBModules = import.meta.glob('/src/content/course/*/lesson/*/app-b/**/*.*');
+for (const path in excerciseBModules) {
+	excerciseBModules[path]().then((mod) => {
+		const splitPath = path.replace('/src/content/', '').split('/');
+		const course = splitPath.at(0);
+		const courseSlug = splitPath.at(1);
+		const lesson = splitPath.at(2);
+		const lessonSlug = splitPath.at(3);
+
+		const dir = `${process.cwd()}/src/content/${course}/${courseSlug}/${lesson}/${lessonSlug}/app-b`;
+
+		markdownFiles.course
+			.filter((c) => c.slug === courseSlug)
+			.map((c) =>
+				c?.lesson
+					?.filter((l) => l.slug === lessonSlug)
+					.map((l) => {
+						l.b = walk(dir);
+					})
+			);
 	});
 }
 
@@ -231,3 +297,46 @@ export const getLessonFromCourseSlug = async (courseSlug: string, slug: string) 
 		courseSlug: course.slug
 	};
 };
+
+export function walk(cwd: string, options: { exclude?: string[] } = {}) {
+	const result: Record<string, FileStub | DirectoryStub> = {};
+
+	if (!fs.existsSync(cwd)) return result;
+
+	function walk_dir(dir: string, depth: number) {
+		const files = fs.readdirSync(path.join(cwd, dir));
+		for (const basename of files) {
+			if (EXCLUDED.has(basename)) continue;
+
+			const name = dir + basename;
+
+			if (options.exclude?.some((exclude) => name.replace(/\\/g, '/').endsWith(exclude))) continue;
+
+			const resolved = path.join(cwd, name);
+			const stats = fs.statSync(resolved);
+
+			if (stats.isDirectory()) {
+				result[name] = {
+					type: 'directory',
+					name,
+					basename
+				};
+
+				walk_dir(name + '/', depth + 1);
+			} else {
+				const text = TEXTFILES.has(path.extname(name) || path.basename(name));
+				const contents = fs.readFileSync(resolved, text ? 'utf-8' : 'base64');
+
+				result[name] = {
+					type: 'file',
+					name,
+					basename,
+					text,
+					contents
+				};
+			}
+		}
+	}
+
+	return walk_dir('/', 1), result;
+}

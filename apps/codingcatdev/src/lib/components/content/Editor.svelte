@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { dev } from '$app/environment';
 	import { onMount } from 'svelte';
-	import { stubs, selected, state } from '$lib/stores/content/lesson';
+	import { stubs, state } from '$lib/stores/content/lesson';
 	import type { editor } from 'monaco-editor';
-	import * as monaco from 'monaco-editor';
 	import type { FileStub, Stub } from '$lib/types/index.js';
 
 	/**
@@ -217,15 +216,16 @@
 
 	$: if (instance) {
 		console.debug('TODO:', $stubs);
-		instance.update_files([
-			{
-				type: 'file',
-				name: '/src/lib/App.svelte',
-				basename: 'App.svelte',
-				text: true,
-				contents: '<h1>Hello world!</h1>\n'
-			}
-		]);
+		instance.update_files($stubs);
+		// instance.update_files([
+		// 	{
+		// 		type: 'file',
+		// 		name: '/src/lib/App.svelte',
+		// 		basename: 'App.svelte',
+		// 		text: true,
+		// 		contents: '<h1>Hello world!</h1>\n'
+		// 	}
+		// ]);
 	}
 
 	$: if (instance) {

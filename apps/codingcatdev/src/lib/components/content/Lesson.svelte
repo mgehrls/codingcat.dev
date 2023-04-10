@@ -7,14 +7,13 @@
 	export let data: {
 		content: Lesson;
 	};
-	console.log(data?.content);
 </script>
 
 {#if data?.content}
 	<div
 		class="grid md:grid-cols-[minmax(50%,_1fr)_1fr]  grid-cols-1 w-full h-full overflow-x-hidden"
 	>
-		<div class="p-1 md:max-h-screen md:overflow-y-auto ">
+		<div class="p-1 md:p-4 md:max-h-screen md:overflow-y-auto ">
 			{#if data?.content?.youtube}
 				<Video
 					sources={[
@@ -25,9 +24,14 @@
 					]}
 				/>
 			{/if}
-			<section class="flex-grow w-full prose lg:prose-xl xl:prose-2xl">
+			<section class="flex-grow w-full prose lg:prose-xl">
 				{@html data.content.html}
 			</section>
+			{#if data?.content?.courseSlug && data?.content?.lesson}
+				<section>
+					<LessonList courseSlug={data.content.courseSlug} lesson={data.content.lesson} />
+				</section>
+			{/if}
 		</div>
 		<section class="grid grid-rows-[1fr_1fr] w-full h-screen md:h-full order-first md:order-none">
 			<div class="container ">
@@ -38,39 +42,6 @@
 			<div>Other</div>
 		</section>
 	</div>
-
-	<!-- <div class="container h-[calc(100%_-_2rem)]">
-		<section class="editor-container h-80">
-			<Editor />
-		</section>
-	</div>
-	<div class="flex justify-center">
-		<section class="justify-center p-1 content-single xl:p-8 sm:flex">
-			<div class="p-1">
-				{#if data?.content?.youtube}
-					<Video
-						sources={[
-							{
-								src: data.content.youtube,
-								type: 'video/youtube'
-							}
-						]}
-					/>
-				{/if}
-				<section class="flex-grow w-full prose lg:prose-xl xl:prose-2xl">
-					{@html data.content.html}
-				</section>
-			</div>
-			{#if data?.content?.lesson && data?.content?.lesson.length > 0 && data?.content?.slug}
-				<div class="hidden xl:block">
-					<LessonList
-						courseSlug={data?.content?.courseSlug || data?.content?.slug}
-						lesson={data.content.lesson}
-					/>
-				</div>
-			{/if}
-		</section>
-	</div> -->
 {:else}
 	<p>No data found yet</p>
 {/if}

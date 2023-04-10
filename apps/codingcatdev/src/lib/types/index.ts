@@ -24,6 +24,8 @@ export interface Lesson extends Content {
 	courseSlug?: string;
 	lesson?: Lesson[];
 	section?: string;
+	a?: Record<string, Stub>;
+	b?: Record<string, Stub>;
 }
 export interface Podcast extends Content {
 	season?: number;
@@ -100,3 +102,12 @@ export interface DirectoryStub {
 }
 
 export type Stub = FileStub | DirectoryStub;
+export interface EditingConstraints {
+	create: string[];
+	remove: string[];
+}
+export interface Scope {
+	prefix: string;
+	depth: number;
+	name: string;
+}
