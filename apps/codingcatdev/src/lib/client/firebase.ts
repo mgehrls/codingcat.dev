@@ -1,5 +1,7 @@
+import { writable } from 'svelte/store';
+
 import { toastStore } from '@codingcatdev/blackcatui';
-import { initializeApp, getApps, FirebaseError } from 'firebase/app';
+import { initializeApp, getApps, FirebaseError, type FirebaseApp } from 'firebase/app';
 import { getAuth, setPersistence, browserSessionPersistence, signInWithEmailAndPassword, signInWithPopup, type AuthProvider, type Auth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, collection, doc, addDoc, onSnapshot, Firestore } from 'firebase/firestore';
 import { httpsCallable, getFunctions, type Functions } from 'firebase/functions';
@@ -21,6 +23,12 @@ let auth: Auth;
 let db: Firestore;
 let functions: Functions;
 
+export const storeFirebaseApp = writable<FirebaseApp | undefined>(undefined);
+export const storeFirebaseAuth = writable<Auth | undefined>(undefined);
+export const storeFirebaseDb = writable<Firestore | undefined>(undefined);
+export const storeFirebaseFunctions = writable<Functions | undefined>(undefined);
+
+
 if (!app &&
 	firebaseConfig.apiKey &&
 	firebaseConfig.authDomain &&
@@ -31,30 +39,34 @@ if (!app &&
 	firebaseConfig.measurementId) {
 
 	app = initializeApp(firebaseConfig);
+	storeFirebaseApp.set(app)
 
 	auth = getAuth(app);
 	// As httpOnly cookies are to be used, do not persist any state client side.
 	setPersistence(auth, browserSessionPersistence);
+	storeFirebaseAuth.set(auth);
 	db = getFirestore(app);
+	storeFirebaseDb.set(db)
 	functions = getFunctions(app);
+	storeFirebaseFunctions.set(functions)
 }
 
 /* AUTH */
 
-const setCookie = (idToken: string) => {
+export const setCcdIdTokenCookie = (idToken: string) => {
 	document.cookie = '__ccdlogin=' + idToken + ';max-age=3600';
 }
 
 export const ccdSignInWithEmailAndPassword = async ({ email, password }: { email: string, password: string }) => {
 	const userResponse = await signInWithEmailAndPassword(auth, email, password);
 	const idToken = await userResponse.user.getIdToken();
-	setCookie(idToken);
+	setCcdIdTokenCookie(idToken);
 }
 
 export const ccdSignUpWithEmailAndPassword = async ({ email, password }: { email: string, password: string }) => {
 	const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 	const idToken = await userCredential.user.getIdToken();
-	setCookie(idToken);
+	setCcdIdTokenCookie(idToken);
 }
 
 export const ccdSignInWithPopUp = async (provider: AuthProvider) => {
@@ -64,7 +76,7 @@ export const ccdSignInWithPopUp = async (provider: AuthProvider) => {
 
 		if (!idToken)
 			throw 'Missing id Token'
-		setCookie(idToken);
+		setCcdIdTokenCookie(idToken);
 	} catch (err) {
 		if (err instanceof FirebaseError) {
 			if (err.code === 'auth/account-exists-with-different-credential') {

@@ -25,6 +25,9 @@ importers:
       firebase:
         specifier: ^9.19.1
         version: 9.19.1
+      firebaseui:
+        specifier: ^6.0.2
+        version: 6.0.2(firebase@9.19.1)
       mdsvex:
         specifier: ^0.10.6
         version: 0.10.6(svelte@3.58.0)
@@ -4258,6 +4261,10 @@ packages:
     resolution: {integrity: sha512-n94yQo4LI3w7erwf84mhRUkUJfhLoCZiLyoOZ/QFsDbcWNZePrLwbQpvZBUG2TNxwV3VjCKPxkiiQA6pe3TrTA==}
     dev: true
 
+  /dialog-polyfill@0.4.10:
+    resolution: {integrity: sha512-j5yGMkP8T00UFgyO+78OxiN5vC5dzRQF3BEio+LhNvDbyfxWBsi3sfPArDm54VloaJwy2hm3erEiDWqHRC8rzw==}
+    dev: false
+
   /dicer@0.3.1:
     resolution: {integrity: sha512-ObioMtXnmjYs3aRtpIJt9rgQSPCIhKVkFPip+E9GUDyWl8N435znUxK/JfNwGZJ2wnn5JKQ7Ly3vOK5Q5dylGA==}
     engines: {node: '>=10.0.0'}
@@ -5201,6 +5208,16 @@ packages:
       '@firebase/util': 1.9.3
     transitivePeerDependencies:
       - encoding
+    dev: false
+
+  /firebaseui@6.0.2(firebase@9.19.1):
+    resolution: {integrity: sha512-Jwwn2I657loKrvedeCrwED9UibLFl8Cm0uH2ntDBSCpruWzG4HXlIWb35WsDdXMILRPQjJ1PwVwuRsrnsxcaXA==}
+    peerDependencies:
+      firebase: ^9.1.3
+    dependencies:
+      dialog-polyfill: 0.4.10
+      firebase: 9.19.1
+      material-design-lite: 1.3.0
     dev: false
 
   /firestore-export-import@0.9.0(@firebase/app-compat@0.2.7)(@firebase/app-types@0.9.0):
@@ -7320,6 +7337,11 @@ packages:
     engines: {node: '>= 12'}
     hasBin: true
     dev: true
+
+  /material-design-lite@1.3.0:
+    resolution: {integrity: sha512-ao76b0bqSTKcEMt7Pui+J/S3eVF0b3GWfuKUwfe2lP5DKlLZOwBq37e0/bXEzxrw7/SuHAuYAdoCwY6mAYhrsg==}
+    engines: {node: '>=0.12.0'}
+    dev: false
 
   /mdsvex@0.10.6(svelte@3.58.0):
     resolution: {integrity: sha512-aGRDY0r5jx9+OOgFdyB9Xm3EBr9OUmcrTDPWLB7a7g8VPRxzPy4MOBmcVYgz7ErhAJ7bZ/coUoj6aHio3x/2mA==}

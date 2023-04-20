@@ -31,7 +31,7 @@ export const actions = {
 
 export const load = (async ({ parent, url }) => {
     const { user } = await parent();
-    if (user) throw redirect(303, '/account');
+    if (user) throw redirect(303, '/dashboard');
 
     return {
         redirectTo: url.searchParams.get('redirectTo') || ''
